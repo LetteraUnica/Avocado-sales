@@ -20,7 +20,8 @@ class MLP(nn.Module):
         self.input_size = input_size
 
         if activation is None:
-            self.activation = nn.SiLU
+            activation = nn.ReLU
+        self.activation = activation
         
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
