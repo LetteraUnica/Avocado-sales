@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Big Datasets
+fruits-360/
+notMNIST_large/

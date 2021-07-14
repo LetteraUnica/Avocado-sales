@@ -5,12 +5,9 @@ import os.path
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-import numpy as np
-from sklearn.metrics import confusion_matrix
-
 
 class MLP(nn.Module):
-    def __init__(self, input_size, num_layers=3, hidden_size=64, n_classes=2, activation=None, device=None):
+    def __init__(self, input_size, n_classes=2, num_layers=3, hidden_size=64, activation=None, device=None):
         super().__init__()
 
         self.num_layers = num_layers
@@ -30,7 +27,7 @@ class MLP(nn.Module):
         self.losses = []
         # architecture
         in_features, out_features = input_size, hidden_size
-        layers = []
+        layers = [nn.Flatten(1)]
         for i in range(num_layers + 2):
             if i == num_layers + 1:
                 out_features = n_classes
@@ -56,8 +53,8 @@ class MLP(nn.Module):
             n = 0
             start = time()
             for x_batch, y_batch in train_loader:
-                x_batch = x_batch.to(self.device)
-                y_batch = y_batch.to(self.device)
+                x_batch = x_batch.to(self.device, non_blocking=True)
+                y_batch = y_batch.to(self.device, non_blocking=True)
 
                 outputs = self.forward(x_batch)
                 optimizer.zero_grad() 
