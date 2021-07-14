@@ -53,7 +53,8 @@ class CNN(nn.Module):
         
         self.model = nn.Sequential(*blocks)
 
-        self.classifier = nn.Sequential(nn.Linear(out_channels, n_classes))
+        self.classifier = nn.Sequential(nn.Dropout(),
+                                        nn.Linear(out_channels, n_classes))
     
         self.name = "deterministic_network"
         self.to(self.device)
