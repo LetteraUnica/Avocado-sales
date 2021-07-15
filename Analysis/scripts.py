@@ -59,19 +59,6 @@ class MatrixLoader(Dataset):
         return self.X[idx], self.y[idx]
 
     
-def get_image_paths(path):
-    image_paths = []
-    for folder in os.listdir(path):
-        for fname in os.listdir(os.path.join(path, folder)):
-            image_path = os.path.join(folder, fname)
-            try:
-                if os.path.getsize(os.path.join(path, image_path)) > 20:
-                    image_paths.append(image_path)
-            except:
-                pass
-
-    return image_paths
-    
 class load_images(Dataset):
     def __init__(self, path, transform=None):
         self.data_path = path

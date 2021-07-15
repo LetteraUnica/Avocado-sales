@@ -53,7 +53,7 @@ class CNN(nn.Module):
         
         self.model = nn.Sequential(*blocks)
 
-        self.classifier = nn.Sequential(nn.Dropout(),
+        self.classifier = nn.Sequential(nn.Dropout(0.1),
                                         nn.Linear(out_channels, n_classes))
     
         self.name = "deterministic_network"
@@ -114,6 +114,7 @@ class CNN(nn.Module):
       
     def accuracy(self, dataloader):
         """ Evaluate network on test set. """
+
         with torch.no_grad():
             correct_predictions = 0.
             n = 0
@@ -214,6 +215,7 @@ class Net(nn.Module):
       
     def accuracy(self, dataloader):
         """ Evaluate network on test set. """
+        self.eval()
         with torch.no_grad():
             correct_predictions = 0.
             n = 0
