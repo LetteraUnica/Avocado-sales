@@ -143,35 +143,6 @@ class BayesianNetwork(PyroModule):
             obs = pyro.sample("obs", dist.Categorical(logits=out), obs=y)
 
         return obs
-    
-    # def guide(self, x_data, y_data=None):
-    #     """ Samples from the Variational distribution and returns predictions. """
-
-    #     # take random samples of det_network's weights from the chosen variational family
-    #     dists = {}
-    #     for key, value in self.det_network.state_dict().items():
-
-    #         # torch.randn_like(x) builds a random tensor whose shape equals x.shape
-    #         loc = pyro.param(str(f"{key}_loc"), torch.randn_like(value)) 
-    #         scale = pyro.param(str(f"{key}_scale"), torch.randn_like(value))
-
-    #         # softplus is a smooth approximation to the ReLU function
-    #         # which constraints the scale tensor to positive values
-    #         distr = dist.Normal(loc=loc, scale=F.softplus(scale))
-
-    #         # add key-value pair to the samples dictionary
-    #         dists[str(key)] = distr
-
-    #     # define a random module from the dictionary of distributions
-    #     lifted_module = pyro.random_module("module", self.det_network, dists)()
-
-    #     with pyro.plate("data", len(x_data)):
-    #         # compute predictions on `x_data`
-    #         out = lifted_module(x_data)
-    #         preds = F.softmax(out, dim=-1)
-        
-    #     return preds
-
 
     def forward(self, X, n_samples=10, threshold=0.5):
         predictive = Predictive(self.model, guide=self.guide, num_samples=n_samples)
@@ -188,8 +159,8 @@ class BayesianNetwork(PyroModule):
             n = 0
             start = time()
             for x_batch, y_batch in train_loader:
-                x_batch = x_batch.to(self.device)
-                y_batch = y_batch.to(self.device)
+                x_batch = x_batch.to(self.device, non_blocking=True)
+                y_batch = y_batch.to(self.device, non_blocking=True)
 
                 epoch_loss += svi.step(x_batch, y_batch)
                 n += 1
