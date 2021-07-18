@@ -93,6 +93,41 @@ class load_images(Dataset):
         return len(self.image_paths)
 
 
+class avocado_colors():
+    def __init__(self):
+        self.colors = ["#4a7337", "#ffdb58", "#a44441"]
+        self.i = -1
+
+    def __getitem__(self, idx):
+        return self.colors[idx]
+    
+    def __call__(self):
+        self.i = (self.i + 1) % len(self.colors)
+        return self.colors[self.i]
+
+    def test_colors(self):
+        for i in range(len(self.colors)):
+            pl.plot(np.random.normal(0,1,1000).cumsum(), color=self.colors[i])
+
+colors = avocado_colors()
+
+def moving_average(x, w=21):
+    return np.convolve(x, np.ones(w), 'same') / w
+
+def plot_series(data, ax=pl, legend=None, w=1):
+    i = 0
+    for column in data:
+        if column != "date":
+            x = pd.to_datetime(data["date"])
+            y = moving_average(data[column], w)
+            label = column if legend is None else legend[i]
+            ax.plot_date(x, y, "-", label=label, color=colors())
+            i += 1
+    ax.legend()
+    ax.set_xlabel("Date")
+
+def sum_columns(data, columns, name):
+    data[name] = data[columns].sum(axis=1)
 
 # def compute_predictions(f, samples, x):
 #     """
