@@ -129,35 +129,22 @@ def plot_series(data, ax=pl, legend=None, w=1):
 def sum_columns(data, columns, name):
     data[name] = data[columns].sum(axis=1)
 
-# def compute_predictions(f, samples, x):
-#     """
-#     Computes the predictions on x of all the models in samples
-    
-#     Returns:
-#         A matrix which entry ij represents the the number of times
-#         the sample x_i has been assigned to class j
-#     """
-#     w = samples["w"]
-#     b = samples["b"]
-#     n_models = w.size()[0]
-#     predictions = torch.zeros(x.size()[0])
-    
-#     for i in range(n_models):
-#         predictions += f(x, w, b)
-    
-#     return predictions / n_models
 
-# def predict_class(samples, x, threshold=0.5):
-#     """Predicts the class a sample will be assigned to"""
-#     return (compute_predictions(samples, x) > threshold).float()
+def params_to_dict(space, bayes_opt_result):
+    params_dict = dict()
+    for var, value in zip(space, bayes_opt_result.x):
+        params_dict[var.name] = value
 
+    return params_dict
 
-# def print_class_wise_accuracy(y_true, y_pred):
-#     """Prints the general accuracy and the class wise accuracy"""
-#     M = confusion_matrix(y_true, y_pred)
-#     supports = np.sum(M, axis=1)
-#     accuracies = np.diag(M) / supports
-    
-#     print("General Accuracy: ", supports@accuracies / sum(supports))
-#     for i in range(len(accuracies)):
-#         print(f"Class {i}: accuracy {accuracies[i]}, support: {supports[i]}")
+def print_optimum(space, bayes_opt_result):
+    for var, value in zip(space, bayes_opt_result.x):
+        print(var.name, ":", value)
+
+def plot_gp(model, x):
+    y_pred, y_std = model.predict(x.reshape(-1, 1), return_std=True)
+
+    y_pred = y_pred.ravel()
+
+    pl.fill_between(x, y_pred - y_std, y_pred + y_std, alpha=0.5, color='k')
+    pl.plot(x, y_pred)
