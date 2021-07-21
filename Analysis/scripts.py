@@ -1,16 +1,15 @@
 from matplotlib.pyplot import xscale
 import torch
-import pyro
 import numpy as np
 import pylab as pl
 import pandas as pd
-import sklearn
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 from torch.utils.data import Dataset
 from torchvision.io import read_image
 import os
+from scipy.stats import norm
 
 
 def normalize_dataframe(data):
@@ -20,9 +19,6 @@ def normalize_dataframe(data):
     x_scaled = scaler.fit_transform(x)
     return pd.DataFrame(x_scaled)
 
-def bmi(w, h):
-    """Computes the bmi"""
-    return w/(h**2)
 
 def dataframe_to_tensor(data, normalize=True, dtype=torch.float32):
     """Converts a dataframe into a torch tensor"""
@@ -114,6 +110,14 @@ colors = avocado_colors()
 def moving_average(x, w=21):
     return np.convolve(x, np.ones(w), 'same') / w
 
+def sliding_minimum(a):
+    b = np.empty_like(a)
+    b[0] = a[0]
+    for i in range(1, len(a)):
+        b[i] = a[i] if a[i] < b[i-1] else b[i-1]
+
+    return b
+
 def plot_series(data, ax=pl, legend=None, w=1):
     i = 0
     for column in data:
@@ -129,7 +133,6 @@ def plot_series(data, ax=pl, legend=None, w=1):
 def sum_columns(data, columns, name):
     data[name] = data[columns].sum(axis=1)
 
-
 def params_to_dict(space, bayes_opt_result):
     params_dict = dict()
     for var, value in zip(space, bayes_opt_result.x):
@@ -141,10 +144,37 @@ def print_optimum(space, bayes_opt_result):
     for var, value in zip(space, bayes_opt_result.x):
         print(var.name, ":", value)
 
-def plot_gp(model, x):
-    y_pred, y_std = model.predict(x.reshape(-1, 1), return_std=True)
+def plot_CI(ax, t, y_pred, y_std, CI=0.95):
+    y_pred, y_std = y_pred.ravel(), y_std.ravel()
 
-    y_pred = y_pred.ravel()
+    alpha = norm.interval(CI)[1]
+    ax.fill_between(t, y_pred - alpha*y_std, y_pred + alpha*y_std, alpha=0.25, color="k", label=f"{CI*100}% CI")
+    ax.plot(t, y_pred, label="Prediction")
 
-    pl.fill_between(x, y_pred - y_std, y_pred + y_std, alpha=0.5, color='k')
-    pl.plot(x, y_pred)
+def average_error(y_pred, y_true):
+    mse = np.mean((y_pred - y_true)**2)
+    return np.sqrt(mse) / np.mean(y_true) * 100
+
+class avocado_plot:
+    def __init__(self, fname="temp.png", color=None):
+        self.fname = fname
+        self.color = color
+
+    def __enter__(self):
+        sns.set_style("whitegrid")
+        self.fig = pl.figure()
+
+        self.fig.patch.set_alpha(0.)
+
+        self.ax = self.fig.add_subplot(111)
+        
+        return self.ax
+        
+    def __exit__(self, type, value, traceback):
+        if self.color is not None:
+            self.ax.patch.set_facecolor(self.color)
+        self.ax.patch.set_alpha(1.)
+        sns.set(font_scale=1.25)
+
+        pl.tight_layout()
+        self.fig.savefig(self.fname, facecolor=self.fig.get_facecolor(), dpi=200)
