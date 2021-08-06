@@ -42,6 +42,7 @@ def one_hot_to_classes(y):
 
 
 class MatrixLoader(Dataset):
+    """Converts a matrix into a dataset"""
     def __init__(self, X, y, transform=None, target_transform=None):
         self.X = X
         self.y = y
@@ -56,6 +57,7 @@ class MatrixLoader(Dataset):
 
     
 class load_images(Dataset):
+    """Loads all the images in a folder"""
     def __init__(self, path, transform=None):
         self.data_path = path
         self.transform = transform
@@ -90,6 +92,7 @@ class load_images(Dataset):
 
 
 class avocado_colors():
+    """Color palette of the avocado"""
     def __init__(self):
         self.colors = ["#4a7337", "#ffdb58", "#a44441"]
         self.i = -1
@@ -119,6 +122,7 @@ def sliding_minimum(a):
     return b
 
 def plot_series(data, ax=pl, legend=None, w=1):
+    """Plots all the columns as a timeseries, apart from the "date" column"""
     i = 0
     for column in data:
         if column != "date":
@@ -156,6 +160,7 @@ def average_error(y_pred, y_true):
     return np.sqrt(mse) / np.mean(y_true) * 100
 
 class avocado_plot:
+    """Context manager which simpifies plotting in avocado style"""
     def __init__(self, fname="temp.png", color=None):
         self.fname = fname
         self.color = color
