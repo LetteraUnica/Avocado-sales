@@ -5,7 +5,10 @@
 ###### Group members: *Cavuoti Lorenzo*, *Ferfoglia Irene*
 
 ## Introduction
-We studied and predicted the trend of avocado sales in the US by year
+We analyzed and predicted the future trend of avocado sales in the US by year.
+
+The prediction was performed with Gaussian Processes, Random Forest and XGBoost.
+The hyperparameters were tuned using Bayesian Optimization techniques with scikit-optimize
 
 The presentation of the project can be found [Here](https://docs.google.com/presentation/d/1gKD0WjSqGN_vrsqLi6VVDofyDwGPDYOc/edit?usp=sharing&ouid=109247243830012558187&rtpof=true&sd=true)
 
